@@ -45,13 +45,20 @@ server.get('/api/users', (req, res) => {
 });
 
 server.get('/api/users/:id', (req, res) => {
-  const { id } = req.params;
-  db.findById(id)
-    .then((user, id) => {
-      res.status(200).json(user);
+  db.findById(req.params.id)
+    .then(user => {
+      if (user) {
+        res.status(200).json(user);
+      } else {
+        res
+          .status(404)
+          .json({ message: 'The user with the specified ID does not exist.' });
+      }
     })
-    .catch(err => {
-      res.status(500).json({ success: false, err });
+    .catch(() => {
+      res
+        .status(500)
+        .json({ errorMessage: 'The user information could not be retrieved.' });
     });
 });
 
