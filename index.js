@@ -80,24 +80,30 @@ server.delete('/api/users/:id', (req, res) => {
     });
 });
 
-server.put('/users/:id', (req, res) => {
-  const { id } = req.params;
-  const userInfo = req.body;
-  console.log(userInfo);
-  db.update(id, userInfo)
-    .then(updated => {
-      if (updated) {
-        res.status(200).json({ success: true, updated });
-      } else {
-        res.status(404).json({
-          success: false,
-          message: 'I cannot find the user you are looking for'
+server.put('/api/users/:id', (req, res) => {
+  const { name, bio } = req.body;
+
+  if (!name || !bio) {
+    res
+      .status(400)
+      .json({ errorMessage: 'Please provide name and bio for the user.' });
+  } else {
+    db.update(req.params.id, req.body)
+      .then(user => {
+        if (user) {
+          res.status(200).json(user);
+        } else {
+          res.status(404).json({
+            message: 'The user with the specified ID does not exist.'
+          });
+        }
+      })
+      .catch(() => {
+        res.status(500).json({
+          errorMessage: 'The user information could not be modified.'
         });
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ success: false, err });
-    });
+      });
+  }
 });
 
 server.listen(4000, () => {
