@@ -15,10 +15,24 @@ server.post('/users', (req, res) => {
   const { name, bio } = req.body;
 
   if (!name || !bio) {
+    /*cancel the request.
+respond with HTTP status code 400 (Bad Request).
+return the following JSON response: { errorMessage: "Please provide name and bio for the user." }.
+
+cancel the request.
+respond with HTTP status code 500 (Server Error).
+return the following JSON object: { error: "There was an error while saving the user to the database" }.
+*/
     res
       .status(400)
       .json({ errorMessage: 'Please provide name and bio for the user.' });
   } else {
+    /*
+save the new user the the database.
+return HTTP status code 201 (Created).
+return the newly created user document.
+*/
+
     db.insert({ name, bio })
       .then(user => {
         res.status(201).json({ success: true, user });
@@ -33,6 +47,12 @@ server.post('/users', (req, res) => {
   }
 });
 server.get('/api/users', (req, res) => {
+  /*
+    If there's an error in retrieving the users from the database:
+cancel the request.
+respond with HTTP status code 500.
+return the following JSON object: { error: "The users information could not be retrieved." }.
+*/
   db.find()
     .then(users => {
       res.status(200).json(users);
@@ -45,6 +65,17 @@ server.get('/api/users', (req, res) => {
 });
 
 server.get('/api/users/:id', (req, res) => {
+  /*
+    If the user with the specified id is not found:
+
+return HTTP status code 404 (Not Found).
+return the following JSON object: { message: "The user with the specified ID does not exist." }.
+If there's an error in retrieving the user from the database:
+
+cancel the request.
+respond with HTTP status code 500.
+return the following JSON object: { error: "The user information could not be retrieved." }.
+    */
   db.findById(req.params.id)
     .then(user => {
       if (user) {
