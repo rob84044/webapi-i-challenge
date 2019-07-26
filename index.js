@@ -11,7 +11,7 @@ server.get('/', (request, response) => {
   response.send('Hello World from express!!');
 });
 
-server.post('/users', (req, res) => {
+server.post('/api/users', (req, res) => {
   const { name, bio } = req.body;
 
   if (!name || !bio) {
