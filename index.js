@@ -11,17 +11,40 @@ server.get('/', (request, response) => {
   response.send('Hello World from express!!');
 });
 
-server.get('/users', (req, res) => {
-  db.find()
+server.post('/users', (req, res) => {
+  const { name, bio } = req.body;
+
+  if (!name || !bio) {
+    res
+      .status(400)
+      .json({ errorMessage: 'Please provide name and bio for the user.' });
+  } else {
+    db.insert({ name, bio })
+      .then(user => {
+        res.status(201).json({ success: true, user });
+      })
+      .catch(err => {
+        res.status(500).json({
+          success: false,
+          err,
+          errorMessage: 'Please provide name and bio for the user.'
+        });
+      });
+  }
+});
+server.get('/api/users', (req, res) => {
+  Users.find()
     .then(users => {
       res.status(200).json(users);
     })
-    .catch(err => {
-      res.status(500).json({ success: false, err });
+    .catch(() => {
+      res.status(500).json({
+        errorMessage: 'The users information could not be retrieved.'
+      });
     });
 });
 
-server.get('/users/:id', (req, res) => {
+server.get('/api/users/:id', (req, res) => {
   const { id } = req.params;
   db.findById(id)
     .then((user, id) => {
@@ -31,25 +54,6 @@ server.get('/users/:id', (req, res) => {
       res.status(500).json({ success: false, err });
     });
 });
-
-server.post('/users', (req, res) => {
-  const { name, bio } = req.body;
-
-  if ((name)&& (bio)){
-     db.insert({ name, bio })
-    .then(user => {
-      res.status(201).json({ success: true, user });
-    })
-    .catch(err => {
-      res.status(400).json({
-        success: false,
-        err,
-        errorMessage: 'Please provide name and bio for the user.'
-      });
-    });
-});
-  }
- 
 
 server.delete('/users/:id', (req, res) => {
   const { id } = req.params;
