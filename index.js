@@ -33,7 +33,7 @@ server.post('/users', (req, res) => {
   }
 });
 server.get('/api/users', (req, res) => {
-  Users.find()
+  db.find()
     .then(users => {
       res.status(200).json(users);
     })
